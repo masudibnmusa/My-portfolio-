@@ -33,7 +33,7 @@
     <nav class="fixed w-full bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 z-50">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16 items-center">
-                <a href="#" class="text-xl font-bold text-primary tracking-tight">Masud Ibn Musa</a>
+                <a href="#top" class="text-xl font-bold text-primary tracking-tight">Masud Ibn Musa</a>
                 <div class="hidden md:flex space-x-8 items-center">
                     <a href="#about" class="hover:text-accent transition text-sm font-medium">About</a>
                     <a href="#projects" class="hover:text-accent transition text-sm font-medium">Projects</a>
@@ -60,7 +60,7 @@
     </nav>
 
     <!-- Hero Section -->
-    <section class="min-h-screen flex items-center justify-center pt-16 fade-in">
+    <section id="top" class="min-h-screen flex items-center justify-center pt-16 fade-in">
         <div class="max-w-6xl mx-auto px-4 text-center">
             <div class="w-48 h-48 mx-auto mb-6 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white text-4xl font-bold border-4 border-white dark:border-gray-800 shadow-xl">
                 <img src="profile.png" alt="Masud Ibn Musa" class="w-full h-full rounded-full object-cover" onerror="this.style.display='none'; this.parentElement.innerHTML='MIM';">
@@ -105,7 +105,7 @@ I specialize in backend development, system design, and turning ideas into real-
 products using modern technologies. I focus on writing clean, efficient code and 
 creating user-friendly solutions that solve practical problems.
 <br>
-Currently, I’m exploring <span class="text-purple-600 font-bold">AI engineering, LLM-based systems, and full-stack development</span> while actively working 
+Currently, I'm exploring <span class="text-purple-600 font-bold">AI engineering, LLM-based systems, and full-stack development</span> while actively working 
 on real projects and improving my software architecture skills.
                 </p>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mt-8">
@@ -259,7 +259,7 @@ on real projects and improving my software architecture skills.
                         <span class="px-4 py-2 bg-gray-100 dark:bg-gray-600 rounded-lg text-sm">AI & Machine Learning</span>
                         <span class="px-4 py-2 bg-gray-100 dark:bg-gray-600 rounded-lg text-sm">Web Development</span>
                         <span class="px-4 py-2 bg-gray-100 dark:bg-gray-600 rounded-lg text-sm">Problem Solving</span>
-                        <span class="px-4 py-2 bg-gray-100 dark:bg-gray-600 rounded-lg text-sm">Open Source Contibution</span>
+                        <span class="px-4 py-2 bg-gray-100 dark:bg-gray-600 rounded-lg text-sm">Open Source Contribution</span>
                         <span class="px-4 py-2 bg-gray-100 dark:bg-gray-600 rounded-lg text-sm">Data Structures</span>
                         <span class="px-4 py-2 bg-gray-100 dark:bg-gray-600 rounded-lg text-sm">Algorithms</span>
                     </div>
@@ -273,37 +273,23 @@ on real projects and improving my software architecture skills.
     <section id="contact" class="py-20">
         <div class="max-w-4xl mx-auto px-4">
             <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900 dark:text-white">Get In Touch</h2>
-            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 md:p-12 border border-gray-100 dark:border-gray-700">
-                <form onsubmit="handleSubmit(event)" class="space-y-6">
-                    <div class="grid md:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Name</label>
-                            <input type="text" required class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition" placeholder="Your name">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Email</label>
-                            <input type="email" required class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition" placeholder="your@email.com">
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Subject</label>
-                        <input type="text" required class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition" placeholder="Project inquiry">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Message</label>
-                        <textarea rows="5" required class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition resize-none" placeholder="Your message..."></textarea>
-                    </div>
-                    <button type="submit" class="w-full py-4 bg-primary text-white rounded-lg font-semibold hover:bg-blue-800 transition shadow-lg hover:shadow-xl">
-                        Send Message <i class="fas fa-paper-plane ml-2"></i>
-                    </button>
-                </form>
-                <div class="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700 text-center">
-                    <p class="text-secondary mb-4">Or reach me directly at</p>
-                    <a href="mailto:masudibnmusa10@gmail.com" class="text-primary hover:text-accent hover:underline text-lg font-medium">masudibnmusa10@gmail.com</a>
-                    <div class="mt-6 flex justify-center gap-4">
-                        <a href="https://github.com/masudibnmusa" target="_blank" class="px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition text-sm"><i class="fab fa-github mr-1"></i>GitHub</a>
-                        <a href="https://www.linkedin.com/in/masudibnmusa10" target="_blank" class="px-4 py-2 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-800 transition text-sm"><i class="fab fa-linkedin mr-1"></i>LinkedIn</a>
-                    </div>
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 md:p-12 border border-gray-100 dark:border-gray-700 text-center">
+                <p class="text-lg text-gray-600 dark:text-gray-300 mb-4">
+                    Feel free to reach out for collaborations or just a friendly hello.
+                </p>
+                <a href="mailto:masudibnmusa10@gmail.com" class="inline-flex items-center gap-2 text-2xl font-bold text-primary hover:text-accent transition">
+                    <i class="fas fa-envelope"></i>
+                    masudibnmusa10@gmail.com
+                </a>
+                <div class="mt-8 flex justify-center gap-4">
+                    <a href="https://github.com/masudibnmusa" target="_blank" class="px-6 py-3 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition flex items-center gap-2 font-medium">
+                        <i class="fab fa-github"></i>
+                        GitHub
+                    </a>
+                    <a href="https://www.linkedin.com/in/masudibnmusa10" target="_blank" class="px-6 py-3 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-800 transition flex items-center gap-2 font-medium">
+                        <i class="fab fa-linkedin"></i>
+                        LinkedIn
+                    </a>
                 </div>
             </div>
         </div>
@@ -337,18 +323,17 @@ on real projects and improving my software architecture skills.
             document.getElementById('mobileMenu').classList.toggle('hidden');
         }
 
-        function handleSubmit(e) {
-            e.preventDefault();
-            alert('Thanks for your message! I will get back to you soon.');
-            e.target.reset();
-        }
-
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
-                });
+                const href = this.getAttribute('href');
+                if (href === '#') {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                } else {
+                    document.querySelector(href).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
                 document.getElementById('mobileMenu').classList.add('hidden');
             });
         });
