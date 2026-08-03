@@ -327,34 +327,108 @@ on real projects and improving my software architecture skills.
     </footer>
 
     <script>
-        function toggleDark() {
-            document.documentElement.classList.toggle('dark');
-            localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
-        }
+    // Maintain conversation history in memory
+    let conversationHistory = [];
 
-        if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
+    function toggleChatbot() {
+        const windowEl = document.getElementById('chat-window');
+        const openIcon = document.getElementById('chat-icon-open');
+        const closeIcon = document.getElementById('chat-icon-close');
+        
+        const isHidden = windowEl.classList.contains('hidden');
+        if (isHidden) {
+            windowEl.classList.remove('hidden');
+            openIcon.classList.add('hidden');
+            closeIcon.classList.remove('hidden');
+        } else {
+            windowEl.classList.add('hidden');
+            openIcon.classList.remove('hidden');
+            closeIcon.classList.add('hidden');
         }
+    }
 
-        function toggleMobileMenu() {
-            document.getElementById('mobileMenu').classList.toggle('hidden');
-        }
+    async function handleSendMessage(e) {
+        e.preventDefault();
+        const inputEl = document.getElementById('chat-input');
+        const messagesEl = document.getElementById('chat-messages');
+        const userText = inputEl.value.trim();
 
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const href = this.getAttribute('href');
-                if (href === '#') {
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                } else {
-                    document.querySelector(href).scrollIntoView({
-                        behavior: 'smooth'
-                    });
-                }
-                document.getElementById('mobileMenu').classList.add('hidden');
+        if (!userText) return;
+
+        // 1. Render User Message on UI
+        messagesEl.innerHTML += `
+            <div class="flex justify-end">
+                <div class="bg-primary text-white p-3 rounded-2xl rounded-tr-none max-w-[85%] shadow-sm">
+                    ${escapeHTML(userText)}
+                </div>
+            </div>
+        `;
+        
+        inputEl.value = '';
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+
+        // 2. Add user message to local history
+        conversationHistory.push({ role: 'user', content: userText });
+
+        // 3. Render Loading State
+        const loadingId = 'loading-' + Date.now();
+        messagesEl.innerHTML += `
+            <div id="${loadingId}" class="flex items-start gap-2">
+                <div class="bg-gray-100 dark:bg-gray-700 text-gray-400 p-3 rounded-2xl rounded-tl-none text-xs animate-pulse">
+                    Thinking...
+                </div>
+            </div>
+        `;
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+
+        try {
+            // 4. Send entire conversation history to Vercel Serverless API
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ messages: conversationHistory })
             });
-        });
-    </script>
+
+            const data = await response.json();
+            document.getElementById(loadingId)?.remove();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Server error');
+            }
+
+            const botReply = data.reply;
+
+            // 5. Save AI response to local history
+            conversationHistory.push({ role: 'model', content: botReply });
+
+            // 6. Render AI Reply
+            messagesEl.innerHTML += `
+                <div class="flex items-start gap-2">
+                    <div class="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 p-3 rounded-2xl rounded-tl-none max-w-[85%]">
+                        ${escapeHTML(botReply)}
+                    </div>
+                </div>
+            `;
+        } catch (error) {
+            document.getElementById(loadingId)?.remove();
+            messagesEl.innerHTML += `
+                <div class="flex items-start gap-2">
+                    <div class="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-300 p-3 rounded-2xl rounded-tl-none text-xs">
+                        Failed to get a reply. Please try again.
+                    </div>
+                </div>
+            `;
+        }
+
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    function escapeHTML(str) {
+        return str.replace(/[&<>'"]/g, 
+            tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+        );
+    }
+</script>
 
 </body>
 </html>
