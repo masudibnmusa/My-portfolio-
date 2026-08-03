@@ -15,7 +15,6 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'GEMINI_API_KEY is not configured on Vercel' });
   }
 
-  // System context defining your bot's behavior and your background
   const systemInstruction = `
     You are an AI assistant representing Masud Ibn Musa on his personal portfolio website.
     
@@ -34,7 +33,6 @@ export default async function handler(req, res) {
     - Answer questions accurately using Masud's details.
   `;
 
-  // Format local history into Gemini REST API payload structure
   const formattedContents = messages.map(msg => ({
     role: msg.role === 'user' ? 'user' : 'model',
     parts: [{ text: msg.content }]
@@ -42,7 +40,7 @@ export default async function handler(req, res) {
 
   try {
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -50,7 +48,11 @@ export default async function handler(req, res) {
           system_instruction: {
             parts: [{ text: systemInstruction }]
           },
-          contents: formattedContents
+          contents: formattedContents,
+          generationConfig: {
+            temperature: 0.5,
+            maxOutputTokens: 250
+          }
         })
       }
     );
@@ -62,7 +64,7 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: data.error?.message || 'API request failed' });
     }
 
-    const replyText = data.candidates[0].content.parts[0].text;
+    const replyText = data.candidates?.[0]?.content?.parts?.[0]?.text || "I'm having trouble processing that right now.";
     return res.status(200).json({ reply: replyText });
 
   } catch (err) {
