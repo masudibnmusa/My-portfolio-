@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Education | Masud Ibn Musa</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        colors: {
+          primary: '#1e293b',
+          accent: '#6366f1',
+          secondary: '#64748b'
+        }
+      }
+    }
+  }
+</script>
+<script>
+  function toggleDark() {
+    document.documentElement.classList.toggle('dark');
+    localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+  }
+  if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    document.documentElement.classList.add('dark');
+  }
+  function toggleMobileMenu() {
+    document.getElementById('mobileMenu').classList.toggle('hidden');
+  }
+</script>
+<style>
+  body { font-family: 'Inter', system-ui, sans-serif; }
+</style>
+</head>
+<body class="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 transition-colors duration-300">
+
+<!-- Navigation -->
+<nav class="fixed w-full bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 z-50">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex justify-between h-16 items-center">
+<a href="index.html#top" class="text-xl font-bold text-primary dark:text-white tracking-tight">Masud Ibn Musa</a>
+<div class="hidden md:flex space-x-8 items-center">
+<a href="index.html#about" class="hover:text-accent transition text-sm font-medium">About</a>
+<a href="education.html" class="text-accent transition text-sm font-medium">Education</a>
+<a href="index.html#projects" class="hover:text-accent transition text-sm font-medium">Projects</a>
+<a href="index.html#skills" class="hover:text-accent transition text-sm font-medium">Skills</a>
+<a href="index.html#contact" class="hover:text-accent transition text-sm font-medium">Contact</a>
+<button onclick="toggleDark()" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+<i class="fas fa-moon dark:hidden text-gray-600"></i>
+<i class="fas fa-sun hidden dark:block text-yellow-400"></i>
+</button>
+</div>
+<button onclick="toggleMobileMenu()" class="md:hidden p-2">
+<i class="fas fa-bars text-xl text-gray-600 dark:text-gray-300"></i>
+</button>
+</div>
+</div>
+<div id="mobileMenu" class="hidden md:hidden bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
+<div class="px-4 py-3 space-y-2">
+<a href="index.html#about" class="block py-2 hover:text-accent">About</a>
+<a href="education.html" class="block py-2 text-accent">Education</a>
+<a href="index.html#projects" class="block py-2 hover:text-accent">Projects</a>
+<a href="index.html#skills" class="block py-2 hover:text-accent">Skills</a>
+<a href="index.html#contact" class="block py-2 hover:text-accent">Contact</a>
+</div>
+</div>
+</nav>
+
+<!-- Page content -->
+<main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-24">
+
+  <header class="mb-16">
+    <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-3">Education</h1>
+    <p class="text-secondary dark:text-gray-400 max-w-xl">
+      A record of my academic background, coursework, and achievements.
+    </p>
+  </header>
+
+  <!-- Timeline -->
+  <div class="relative border-l-2 border-gray-200 dark:border-gray-700 ml-3 space-y-14">
+
+    <!-- Entry 1: PLACEHOLDER — replace with real details -->
+    <div class="relative pl-10">
+      <span class="absolute -left-[11px] top-1 w-5 h-5 rounded-full bg-accent border-4 border-white dark:border-gray-900"></span>
+      <div class="bg-gray-50 dark:bg-gray-800 rounded-2xl p-6 border border-gray-100 dark:border-gray-700 shadow-sm">
+        <div class="flex flex-wrap items-baseline justify-between gap-2 mb-2">
+          <h2 class="text-xl font-bold text-gray-900 dark:text-white">[Degree, e.g. B.Sc. in Computer Science &amp; Engineering]</h2>
+          <span class="text-sm text-secondary dark:text-gray-400 font-medium">[Start Year] – [End Year]</span>
+        </div>
+        <p class="text-accent font-medium mb-3">[University / Institution Name]</p>
+        <p class="text-secondary dark:text-gray-400 text-sm mb-4">
+          [Short description — focus area, thesis, notable achievements, or activities.]
+        </p>
+        <div class="flex flex-wrap gap-2">
+          <span class="px-3 py-1 bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-300 rounded-full text-xs font-medium">[CGPA: X.XX / 4.00]</span>
+          <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 rounded-full text-xs font-medium">[Relevant Coursework]</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Entry 2: PLACEHOLDER — duplicate/remove as needed -->
+    <div class="relative pl-10">
+      <span class="absolute -left-[11px] top-1 w-5 h-5 rounded-full bg-gray-300 dark:bg-gray-600 border-4 border-white dark:border-gray-900"></span>
+      <div class="bg-gray-50 dark:bg-gray-800 rounded-2xl p-6 border border-gray-100 dark:border-gray-700 shadow-sm">
+        <div class="flex flex-wrap items-baseline justify-between gap-2 mb-2">
+          <h2 class="text-xl font-bold text-gray-900 dark:text-white">[Higher Secondary Certificate]</h2>
+          <span class="text-sm text-secondary dark:text-gray-400 font-medium">[Start Year] – [End Year]</span>
+        </div>
+        <p class="text-accent font-medium mb-3">[College Name]</p>
+        <p class="text-secondary dark:text-gray-400 text-sm mb-4">
+          [Group / major subjects, e.g. Science.]
+        </p>
+        <div class="flex flex-wrap gap-2">
+          <span class="px-3 py-1 bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-300 rounded-full text-xs font-medium">[GPA: X.XX / 5.00]</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Certifications -->
+  <section class="mt-20">
+    <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Certifications</h2>
+    <div class="grid sm:grid-cols-2 gap-4">
+      <div class="flex items-start gap-3 bg-gray-50 dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700">
+        <i class="fas fa-certificate text-accent mt-1"></i>
+        <div>
+          <p class="font-medium text-gray-900 dark:text-white text-sm">[Certification Name]</p>
+          <p class="text-secondary dark:text-gray-400 text-xs">[Issuing Organization · Year]</p>
+        </div>
+      </div>
+      <div class="flex items-start gap-3 bg-gray-50 dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700">
+        <i class="fas fa-certificate text-accent mt-1"></i>
+        <div>
+          <p class="font-medium text-gray-900 dark:text-white text-sm">[Certification Name]</p>
+          <p class="text-secondary dark:text-gray-400 text-xs">[Issuing Organization · Year]</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <a href="index.html" class="inline-flex items-center gap-2 mt-16 text-sm font-medium text-accent hover:opacity-80 transition">
+    <i class="fas fa-arrow-left"></i> Back to home
+  </a>
+
+</main>
+
+</body>
+</html>
