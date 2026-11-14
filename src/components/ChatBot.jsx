@@ -1,20 +1,31 @@
 import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
+import { ChatCircleDots, PaperPlaneRight, X } from '@phosphor-icons/react'
+import { easeOut } from '../motion'
 
-const GREETING = "Hi there! 👋 I'm Masud's AI assistant. Ask me anything about his projects, tech stack, or background!"
-const bubbleIn = { initial: { opacity: 0, y: 8, scale: 0.97 }, animate: { opacity: 1, y: 0, scale: 1 }, transition: { type: 'spring', bounce: 0.2, duration: 0.35 } }
+const GREETING = "Hi, I'm Masud's assistant. Ask me about his projects, his stack or his background."
+const bubbleIn = { initial: { opacity: 0, y: 8 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.4, ease: easeOut } }
 
 function Bubble({ role, children }) {
   const styles = {
-    user: 'bg-primary text-white rounded-tr-none shadow-sm',
-    model: 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-tl-none',
-    error: 'bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-300 rounded-tl-none text-xs',
-    loading: 'bg-gray-100 dark:bg-gray-700 text-gray-400 rounded-tl-none text-xs animate-pulse',
+    user: 'bg-ink text-on-ink rounded-tr-sm ml-auto',
+    model: 'bg-surface text-ink rounded-tl-sm',
+    error: 'bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-300 rounded-tl-sm',
   }
   return (
-    <motion.div {...bubbleIn} className={role === 'user' ? 'flex justify-end' : 'flex items-start gap-2'}>
-      <div className={`p-3 rounded-2xl max-w-[85%] whitespace-pre-wrap ${styles[role]}`}>{children}</div>
+    <motion.div {...bubbleIn} className={`w-fit max-w-[85%] p-3 rounded-2xl whitespace-pre-wrap body-6 ${styles[role]}`}>
+      {children}
     </motion.div>
+  )
+}
+
+// Skeleton shaped like a reply, not a spinner
+function Typing() {
+  return (
+    <div className="w-3/4 p-3 rounded-2xl rounded-tl-sm bg-surface space-y-2" aria-label="Assistant is typing">
+      <div className="h-3 rounded bg-line animate-pulse" />
+      <div className="h-3 w-2/3 rounded bg-line animate-pulse" />
+    </div>
   )
 }
 
@@ -57,66 +68,53 @@ export default function ChatBot() {
       setMessages((m) => [...m, { role: 'model', content: data.reply }])
     } catch (err) {
       console.error('Chat error:', err)
-      setMessages((m) => [...m, { role: 'error', content: 'Failed to get a reply. Please try again.' }])
+      setMessages((m) => [...m, { role: 'error', content: 'No reply came back. Check your connection and send the message again.' }])
     } finally {
       setLoading(false)
     }
   }
 
+  const Icon = open ? X : ChatCircleDots
+
   return (
-    <div className="fixed bottom-6 right-6 z-50">
-      <motion.button onClick={() => setOpen((o) => !o)} aria-label={open ? 'Close chat assistant' : 'Open chat assistant'}
-        aria-expanded={open} aria-controls="chat-window" whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.92 }}
-        className="w-14 h-14 bg-primary text-white rounded-full shadow-2xl flex items-center justify-center border-2 border-white dark:border-gray-800">
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.i key={open ? 'close' : 'open'} className={`fas ${open ? 'fa-times' : 'fa-robot'} text-2xl`} aria-hidden="true"
-            initial={{ rotate: -90, scale: 0.5, opacity: 0 }} animate={{ rotate: 0, scale: 1, opacity: 1 }}
-            exit={{ rotate: 90, scale: 0.5, opacity: 0, transition: { duration: 0.1 } }}
-            transition={{ type: 'spring', bounce: 0.4, duration: 0.35 }} />
-        </AnimatePresence>
-      </motion.button>
+    <div className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-40">
+      <button onClick={() => setOpen((o) => !o)} aria-label={open ? 'Close chat assistant' : 'Open chat assistant'}
+        aria-expanded={open} aria-controls="chat-window"
+        className="w-12 h-12 grid place-items-center rounded-full bg-ink text-on-ink shadow-lg transition-transform duration-500 ease-base hover:-translate-y-0.5 active:scale-[0.98]">
+        <Icon size={22} weight="bold" aria-hidden="true" />
+      </button>
 
       <AnimatePresence>
         {open && (
           <motion.div key="chat" id="chat-window" role="dialog" aria-label="Chat with Masud's assistant"
-            initial={{ opacity: 0, scale: 0.85, y: 16 }} animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 12, transition: { duration: 0.15, ease: 'easeIn' } }}
-            transition={{ type: 'spring', bounce: 0.25, duration: 0.4 }}
-            className="absolute bottom-16 right-0 w-80 sm:w-96 max-w-[calc(100vw-3rem)] h-[480px] bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 flex flex-col overflow-hidden origin-bottom-right">
-            <div className="bg-primary p-4 text-white flex justify-between items-center">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
-                  <i className="fas fa-robot text-sm" aria-hidden="true" />
-                </div>
-                <div>
-                  <h4 className="font-bold text-sm">Masud's Assistant</h4>
-                  <p className="text-xs text-blue-200 flex items-center gap-1">
-                    <span className="w-2 h-2 rounded-full bg-green-400 inline-block" /> Online
-                  </p>
-                </div>
+            initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }}
+            transition={{ duration: 0.4, ease: easeOut }}
+            className="absolute bottom-16 right-0 w-80 sm:w-96 max-w-[calc(100vw-2rem)] h-[480px] max-h-[calc(100svh-8rem)] bg-raised rounded-2xl shadow-2xl border border-line flex flex-col overflow-hidden">
+            <div className="p-4 border-b border-line flex justify-between items-center">
+              <div>
+                <h2 className="title-4 text-ink">Masud's assistant</h2>
+                <p className="caption-5 text-muted">Answers from his portfolio, powered by AI</p>
               </div>
-              <button onClick={() => setOpen(false)} aria-label="Close chat" className="w-9 h-9 grid place-items-center text-white/80 hover:text-white">
-                <i className="fas fa-times" aria-hidden="true" />
+              <button onClick={() => setOpen(false)} aria-label="Close chat" className="w-11 h-11 -mr-2 grid place-items-center rounded-full text-muted hover:text-ink hover:bg-surface">
+                <X size={18} aria-hidden="true" />
               </button>
             </div>
 
-            <div ref={listRef} aria-live="polite" className="flex-1 p-4 overflow-y-auto space-y-3 text-sm">
+            <div ref={listRef} aria-live="polite" className="flex-1 p-4 overflow-y-auto flex flex-col gap-3">
               <Bubble role="model">{GREETING}</Bubble>
               {messages.map((m, i) => <Bubble key={i} role={m.role}>{m.content}</Bubble>)}
-              {loading && <Bubble role="loading">Thinking...</Bubble>}
+              {loading && <Typing />}
             </div>
 
-            <div className="p-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
-              <form onSubmit={send} className="flex gap-2">
-                <input ref={inputRef} type="text" value={input} onChange={(e) => setInput(e.target.value)} aria-label="Your message"
-                  placeholder="Ask something..." required
-                  className="flex-1 px-4 py-2 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:border-accent text-gray-900 dark:text-white placeholder-gray-400" />
-                <motion.button type="submit" aria-label="Send message" disabled={loading} whileTap={{ scale: 0.9 }}
-                  className="px-4 py-2 bg-primary text-white rounded-xl hover:bg-blue-800 transition-colors disabled:opacity-50">
-                  <i className="fas fa-paper-plane text-xs" aria-hidden="true" />
-                </motion.button>
-              </form>
-            </div>
+            <form onSubmit={send} className="p-3 border-t border-line flex gap-2">
+              <input ref={inputRef} type="text" value={input} onChange={(e) => setInput(e.target.value)} aria-label="Your message"
+                placeholder="Ask about a project" required
+                className="flex-1 min-w-0 px-3 py-2 body-6 bg-surface border border-line rounded-lg text-ink placeholder:text-muted focus-visible:border-accent" />
+              <button type="submit" aria-label="Send message" disabled={loading}
+                className="w-11 h-11 grid place-items-center rounded-lg bg-ink text-on-ink transition-transform duration-500 ease-base active:scale-[0.98] disabled:opacity-50">
+                <PaperPlaneRight size={18} aria-hidden="true" />
+              </button>
+            </form>
           </motion.div>
         )}
       </AnimatePresence>

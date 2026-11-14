@@ -1,115 +1,86 @@
-import { useEffect, useState } from 'react'
-import { motion, useReducedMotion } from 'motion/react'
-import { socials } from '../data'
-import { easeOut, press } from '../motion'
-import FallingIcons from './FallingIcons'
+import { useEffect, useRef } from 'react'
+import { animate, motion, useMotionValue, useScroll, useTransform } from 'motion/react'
+import { EnvelopeSimple, GithubLogo, MapPin } from '@phosphor-icons/react'
+import { EMAIL, GITHUB } from '../data'
+import { easeOut, spring } from '../motion'
 
-const container = { hidden: {}, show: { transition: { staggerChildren: 0.08, delayChildren: 0.1 } } }
-const child = { hidden: { opacity: 0, y: 24 }, show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: easeOut } } }
-const drift = (x, y, duration) => ({ animate: { x, y }, transition: { duration, repeat: Infinity, ease: 'easeInOut' } })
+const enter = (delay) => ({ initial: { opacity: 0, y: 24 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.7, ease: easeOut, delay } })
+const LINES = ['I build AI agents', 'and the apps around them']
 
-const NAME = 'Masud Ibn Musa'
-const ROLES = ['Software Developer', 'AI Enthusiast', 'Full-Stack Engineer', 'Backend Developer']
-
-// Types each word, pauses, deletes it, moves to the next
-function Typewriter({ words }) {
-  const reduced = useReducedMotion()
-  const [index, setIndex] = useState(0)
-  const [text, setText] = useState('')
-  const [deleting, setDeleting] = useState(false)
-
-  useEffect(() => {
-    if (reduced) return
-    const word = words[index]
-    let delay = deleting ? 40 : 80
-    if (!deleting && text === word) delay = 1600
-    const t = setTimeout(() => {
-      if (!deleting && text === word) setDeleting(true)
-      else if (deleting && text === '') { setDeleting(false); setIndex((index + 1) % words.length) }
-      else setText(word.slice(0, text.length + (deleting ? -1 : 1)))
-    }, delay)
-    return () => clearTimeout(t)
-  }, [text, deleting, index, words, reduced])
-
-  if (reduced) return <span>{words.join(' · ')}</span>
+// Same pair of actions at the top and the bottom of the page
+export function Actions() {
   return (
-    <>
-      <span>{text}</span>
-      <motion.span className="inline-block w-[0.6ch] h-[1.1em] -mb-[0.15em] ml-0.5 bg-accent"
-        animate={{ opacity: [1, 0] }} transition={{ duration: 0.6, repeat: Infinity, repeatType: 'reverse' }} />
-    </>
+    <div className="flex flex-wrap gap-3">
+      <motion.a href={`mailto:${EMAIL}`} whileTap={{ scale: 0.97 }} transition={spring} className="btn btn-primary">
+        <EnvelopeSimple size={18} weight="bold" aria-hidden="true" />Email me
+      </motion.a>
+      <motion.a href={GITHUB} target="_blank" rel="noopener noreferrer" whileTap={{ scale: 0.97 }} transition={spring} className="btn btn-secondary">
+        <GithubLogo size={18} aria-hidden="true" />View GitHub
+      </motion.a>
+    </div>
   )
 }
 
+// Counts up once on load; the number renders straight from the motion value, no React re-renders
+function CountUp({ to, delay = 0 }) {
+  const value = useMotionValue(0)
+  const rounded = useTransform(() => Math.round(value.get()))
+  useEffect(() => {
+    const controls = animate(value, to, { duration: 1.6, ease: easeOut, delay })
+    return () => controls.stop()
+  }, [value, to, delay])
+  return <motion.span>{rounded}</motion.span>
+}
+
 export default function Hero() {
-  const [imgFailed, setImgFailed] = useState(false)
+  const ref = useRef(null)
+  // Photo drifts up a little slower than the page as the hero scrolls away
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] })
+  const photoY = useTransform(scrollYProgress, [0, 1], [0, 80])
 
   return (
-    <section id="top" className="relative min-h-screen flex items-center justify-center pt-16 overflow-hidden">
-      <div className="hero-grid absolute inset-0 -z-10" aria-hidden="true" />
-      <FallingIcons />
-      <motion.div {...drift([0, 40, -20, 0], [0, -30, 20, 0], 18)} aria-hidden="true"
-        className="absolute -z-10 top-1/4 left-1/2 -ml-72 w-md h-112 rounded-full bg-accent/20 blur-3xl" />
-      <motion.div {...drift([0, -30, 25, 0], [0, 25, -15, 0], 22)} aria-hidden="true"
-        className="absolute -z-10 bottom-10 left-1/2 ml-8 w-88 h-88 rounded-full bg-purple-500/15 blur-3xl" />
+    <section ref={ref} id="top" className="min-h-svh flex items-center pt-24 pb-16">
+      <div className="mx-auto max-w-6xl px-6 w-full grid gap-12 md:grid-cols-[auto_1fr] md:items-center">
+        <div>
+          <motion.p {...enter(0)} className="caption-1 text-muted flex items-center gap-2 mb-6">
+            <MapPin size={16} aria-hidden="true" /> Dhaka, Bangladesh
+          </motion.p>
 
-      <motion.div className="max-w-6xl mx-auto px-4 text-center" variants={container} initial="hidden" animate="show">
-        <motion.div variants={child} className="relative w-56 h-56 md:w-72 md:h-72 mx-auto mb-8">
-          <div className="absolute -inset-1.5 rounded-full bg-linear-to-br from-accent via-purple-500 to-primary opacity-70 blur-md" aria-hidden="true" />
-          <div className="relative w-full h-full rounded-full bg-linear-to-br from-primary to-accent flex items-center justify-center text-white text-4xl font-bold border-4 border-white dark:border-gray-900 shadow-xl">
-            {imgFailed ? 'MIM' : (
-              <img src="/profile.png" alt="Masud Ibn Musa" width="288" height="288" onError={() => setImgFailed(true)}
-                className="w-full h-full rounded-full object-cover" />
-            )}
-          </div>
-        </motion.div>
-        <motion.h1 variants={child} className="font-display text-5xl md:text-7xl font-bold tracking-tighter mb-4 text-gray-900 dark:text-white">
-          <span className="sr-only">{NAME}</span>
-          {/* Each letter springs up on hover */}
-          <span aria-hidden="true" className="inline-flex flex-wrap justify-center">
-            {[...NAME].map((ch, i) => ch === ' ' ? <span key={i} className="w-[0.3em]" /> : (
-              <motion.span key={i} className="inline-block cursor-default hover:text-accent transition-colors"
-                whileHover={{ y: -10, rotate: i % 2 ? 6 : -6 }} transition={{ type: 'spring', bounce: 0.6, duration: 0.4 }}>
-                {ch}
-              </motion.span>
+          {/* Each line slides up from behind its own mask */}
+          <h1 className="heading-3 sm:heading-2 max-w-[680px]">
+            {LINES.map((line, i) => (
+              <span key={line} className="block overflow-hidden pb-1">
+                <motion.span className="block hero-gradient"
+                  initial={{ y: '110%' }} animate={{ y: 0 }}
+                  transition={{ duration: 0.9, ease: easeOut, delay: 0.1 + i * 0.12 }}>
+                  {line}
+                </motion.span>
+              </span>
             ))}
-          </span>
-        </motion.h1>
-        <motion.p variants={child} className="font-mono text-base md:text-lg text-gray-700 dark:text-gray-300 mb-4 h-7">
-          <span className="sr-only">{ROLES.join(', ')}</span>
-          <span aria-hidden="true"><span className="text-accent">&gt;</span> <Typewriter words={ROLES} /></span>
-        </motion.p>
-        <motion.p variants={child} className="text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-2 max-w-2xl mx-auto">
-          Software Engineering Student at Daffodil International University
-        </motion.p>
-        <motion.p variants={child} className="text-base text-secondary mb-8 max-w-2xl mx-auto flex items-center justify-center gap-2">
-          <i className="fas fa-map-marker-alt text-accent" aria-hidden="true" /> Dhaka, Bangladesh
-        </motion.p>
-        <motion.div variants={child} className="flex flex-wrap justify-center gap-4 mb-8">
-          <motion.a href="#projects" {...press}
-            className="px-8 py-3 bg-primary text-white rounded-lg hover:bg-blue-800 transition-colors shadow-lg shadow-primary/25 font-medium">
-            View Projects <i className="fas fa-arrow-right ml-1 text-sm" aria-hidden="true" />
-          </motion.a>
-          <motion.a href="#contact" {...press}
-            className="px-8 py-3 border-2 border-primary dark:border-gray-500 text-primary dark:text-white rounded-lg hover:bg-primary hover:text-white transition-colors font-medium">
-            Contact Me
-          </motion.a>
-        </motion.div>
-        <motion.div variants={child} className="flex justify-center gap-2 text-2xl text-secondary">
-          {socials.map((s) => (
-            <motion.a key={s.label} href={s.href} aria-label={s.label} {...press} whileHover={{ y: -3 }}
-              {...(s.href.startsWith('http') && { target: '_blank', rel: 'noopener noreferrer' })}
-              className="w-11 h-11 grid place-items-center hover:text-accent transition-colors">
-              <i className={s.icon} aria-hidden="true" />
-            </motion.a>
-          ))}
-        </motion.div>
-      </motion.div>
+          </h1>
 
-      <a href="#about" aria-label="Scroll to About" className="absolute bottom-8 left-1/2 -translate-x-1/2 text-secondary hover:text-accent transition-colors">
-        <motion.i className="fas fa-chevron-down text-lg block" aria-hidden="true"
-          animate={{ y: [0, 6, 0] }} transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }} />
-      </a>
+          <motion.p {...enter(0.35)} className="title-2 font-normal text-muted mt-6 max-w-[680px]">
+            I'm Masud, studying Software Engineering at Daffodil International University.
+            I work on LLM pipelines, multi agent systems and MCP servers, and ship full stack apps
+            in Python, Java and JavaScript.
+          </motion.p>
+          <motion.div {...enter(0.45)} className="mt-8"><Actions /></motion.div>
+          <motion.p {...enter(0.55)} className="caption-1 text-muted mt-6">
+            <span className="text-ink tabular-nums"><CountUp to={60} delay={0.6} />+ projects</span> with public source on GitHub
+          </motion.p>
+        </div>
+
+        <motion.div style={{ y: photoY }} className="w-full max-w-sm mx-auto md:mx-0 md:order-first md:w-96 lg:w-md">
+          {/* Wipes open from the bottom while the photo settles from a slight zoom; the cut edge at the waist fades out */}
+          <motion.div className="[mask-image:linear-gradient(to_bottom,#000_80%,transparent)]"
+            initial={{ clipPath: 'inset(100% 0% 0% 0%)' }} animate={{ clipPath: 'inset(0% 0% 0% 0%)' }}
+            transition={{ duration: 1.1, ease: easeOut, delay: 0.2 }}>
+            <motion.img src="/profile-cutout.webp" alt="Portrait of Masud Ibn Musa" width="900" height="1301" fetchPriority="high"
+              className="w-full h-auto origin-bottom"
+              initial={{ scale: 1.1 }} animate={{ scale: 1 }} transition={{ duration: 1.4, ease: easeOut, delay: 0.2 }} />
+          </motion.div>
+        </motion.div>
+      </div>
     </section>
   )
 }

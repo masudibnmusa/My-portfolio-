@@ -1,75 +1,76 @@
+import { useState } from 'react'
 import { motion } from 'motion/react'
-import { caseStudies, fullStackProjects, tagColors } from '../data'
-import { cardHover, item, press, reveal, staggerGrid } from '../motion'
+import { ArrowUpRight } from '@phosphor-icons/react'
+import { caseStudies, fullStackProjects } from '../data'
+import { rise, spring, stagger } from '../motion'
+import Section from './Section'
 
-const linkProps = { target: '_blank', rel: 'noopener noreferrer' }
+const ext = { target: '_blank', rel: 'noopener noreferrer' }
+
+function Tags({ tags }) {
+  return (
+    <ul className="flex flex-wrap gap-2" aria-label="Tech used">
+      {tags.map((t) => (
+        <li key={t} className="font-mono caption-4 px-2 py-1 rounded-md border border-line text-muted">{t}</li>
+      ))}
+    </ul>
+  )
+}
+
+// Arrow nudges toward the link's destination when its card or row is hovered
+const arrowClass = 'text-muted transition-transform duration-500 ease-base group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-accent group-focus-visible:text-accent'
 
 export function CaseStudies() {
   return (
-    <section id="projects" className="py-24">
-      <div className="max-w-6xl mx-auto px-6">
-        <motion.div {...reveal} className="text-center mb-20">
-          <p className="font-mono text-xs font-medium tracking-[0.2em] uppercase text-accent mb-6">Featured Work</p>
-          <h2 className="font-display text-4xl md:text-6xl font-bold tracking-tight text-gray-900 dark:text-white mb-6">Case Studies</h2>
-          <p className="text-base md:text-lg text-secondary max-w-2xl mx-auto">What I built, the tools behind it, and what each project does</p>
-        </motion.div>
-
-        <motion.div {...staggerGrid} className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {caseStudies.map((p) => (
-            <motion.article key={p.title} variants={item} {...cardHover}
-              className="flex flex-col rounded-xl transition-shadow duration-300 hover:shadow-2xl ring-1 ring-gray-200/70 dark:ring-gray-700 bg-gray-50 dark:bg-gray-800 px-8 py-10">
-              <h3 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-4">{p.title}</h3>
-              <p className="font-medium leading-relaxed text-gray-700 dark:text-gray-300 mb-6">{p.desc}</p>
-              <div className="flex flex-wrap gap-2 mb-6">
-                {p.tags.map((t) => (
-                  <span key={t} className="px-3 py-1.5 border border-primary dark:border-accent text-primary dark:text-accent rounded font-mono text-xs font-medium">{t}</span>
-                ))}
+    <Section id="work" title="Selected AI work" intro="LLM pipelines, agents and the tooling around them. Each card opens the source on GitHub.">
+      <motion.ul {...stagger(0.08)} className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {caseStudies.map((p, i) => (
+          <motion.li key={p.title} variants={rise}>
+            <motion.a href={p.href} {...ext}
+              whileHover={{ y: -6, transition: spring }} whileTap={{ scale: 0.98, transition: spring }}
+              className="group h-full flex flex-col gap-4 rounded-2xl border border-line bg-raised p-6 transition-[border-color,box-shadow] duration-500 ease-base hover:border-muted hover:shadow-lg">
+              <div className="flex items-center justify-between">
+                <span className="font-mono caption-4 text-muted">{String(i + 1).padStart(2, '0')}</span>
+                <ArrowUpRight size={20} aria-hidden="true" className={arrowClass} />
               </div>
-              <motion.a href={p.href} {...linkProps} {...press}
-                className="mt-auto self-start text-sm font-semibold text-primary dark:text-accent hover:text-accent dark:hover:text-white transition-colors">
-                <i className="fab fa-github mr-1" aria-hidden="true" />Code
-              </motion.a>
-            </motion.article>
-          ))}
-        </motion.div>
-      </div>
-    </section>
+              <h3 className="title-1 text-ink">{p.title}</h3>
+              <p className="body-6 text-muted flex-1">{p.desc}</p>
+              <Tags tags={p.tags} />
+              <span className="sr-only">(opens GitHub in a new tab)</span>
+            </motion.a>
+          </motion.li>
+        ))}
+      </motion.ul>
+    </Section>
   )
 }
 
 export function FullStackProjects() {
+  // One highlight glides between rows, following the pointer or keyboard focus
+  const [hovered, setHovered] = useState(null)
+
   return (
-    <section id="fullstack" className="py-20">
-      <div className="max-w-6xl mx-auto px-4">
-        <motion.h2 {...reveal} className="font-display tracking-tight text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900 dark:text-white">
-          Full-Stack Projects
-        </motion.h2>
-        <motion.div {...staggerGrid} className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {fullStackProjects.map((p) => (
-            <motion.div key={p.title} variants={item} {...cardHover}
-              className="group bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300 border border-gray-100 dark:border-gray-700">
-              <div className={`h-48 bg-linear-to-br ${p.gradient} flex items-center justify-center overflow-hidden`}>
-                <i className={`fas ${p.icon} text-6xl text-white/80 transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-6`} aria-hidden="true" />
+    <Section id="projects" title="More projects" intro="Full stack, database and IoT work from university and side projects." surface>
+      <motion.ul {...stagger(0.04)} onMouseLeave={() => setHovered(null)}
+        className="rounded-2xl border border-line bg-raised divide-y divide-line overflow-hidden">
+        {fullStackProjects.map((p, i) => (
+          <motion.li key={p.title} variants={rise} className="relative">
+            {hovered === i && <motion.span layoutId="row-highlight" transition={spring} className="absolute inset-0 bg-surface" aria-hidden="true" />}
+            <a href={p.href} {...ext} onMouseEnter={() => setHovered(i)} onFocus={() => setHovered(i)} onBlur={() => setHovered(null)}
+              className="group relative grid gap-3 p-6 md:grid-cols-[1fr_auto] md:items-center md:gap-8">
+              <div>
+                <h3 className="title-2 text-ink">
+                  {p.title}{' '}
+                  <ArrowUpRight size={16} aria-hidden="true" className={`inline align-baseline ml-1 ${arrowClass}`} />
+                </h3>
+                <p className="body-6 text-muted mt-1">{p.desc}</p>
               </div>
-              <div className="p-6">
-                <h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-white">{p.title}</h3>
-                <p className="text-secondary mb-4 text-sm">{p.desc}</p>
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {p.tags.map(([label, color]) => (
-                    <span key={label} className={`px-3 py-1 rounded-full text-xs font-medium ${tagColors[color]}`}>{label}</span>
-                  ))}
-                </div>
-                <div className="flex gap-4">
-                  <motion.a href={p.href} {...linkProps} {...press} className="text-primary dark:text-accent hover:text-accent transition-colors text-sm font-medium">
-                    <i className="fab fa-github mr-1" aria-hidden="true" />Code
-                  </motion.a>
-                  <span className="text-gray-400 text-sm"><i className="fas fa-clock mr-1" aria-hidden="true" />Coming Soon</span>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
-      </div>
-    </section>
+              <Tags tags={p.tags} />
+              <span className="sr-only">(opens GitHub in a new tab)</span>
+            </a>
+          </motion.li>
+        ))}
+      </motion.ul>
+    </Section>
   )
 }

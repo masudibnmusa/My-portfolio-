@@ -1,76 +1,120 @@
 import { useEffect, useState } from 'react'
-import { AnimatePresence, motion, useScroll } from 'motion/react'
+import { AnimatePresence, motion } from 'motion/react'
+import { Moon, Sun } from '@phosphor-icons/react'
 import { navLinks } from '../data'
+import { easeOut, spring } from '../motion'
 
 function useDarkMode() {
   const [dark, setDark] = useState(() => document.documentElement.classList.contains('dark'))
   useEffect(() => {
     document.documentElement.classList.toggle('dark', dark)
-    localStorage.setItem('theme', dark ? 'dark' : 'light')
+    try { localStorage.setItem('theme', dark ? 'dark' : 'light') } catch { /* storage blocked: theme just won't persist */ }
   }, [dark])
   return [dark, () => setDark((d) => !d)]
+}
+
+// The section currently crossing the middle of the screen
+function useActiveSection(ids) {
+  const [active, setActive] = useState(null)
+  useEffect(() => {
+    const io = new IntersectionObserver(
+      (entries) => entries.forEach((e) => e.isIntersecting && setActive(e.target.id)),
+      { rootMargin: '-45% 0px -50% 0px' },
+    )
+    ids.forEach((id) => { const el = document.getElementById(id); if (el) io.observe(el) })
+    return () => io.disconnect()
+  }, [ids])
+  return active
+}
+
+// 'top' is watched too, so no link stays highlighted when you scroll back to the hero
+const ids = ['top', ...navLinks.map((l) => l.href.slice(1))]
+
+// Two lines that rotate into an X
+function MenuIcon({ open }) {
+  const t = { duration: 0.5, ease: easeOut }
+  return (
+    <span className="relative block w-5 h-3" aria-hidden="true">
+      <motion.span className="absolute left-0 right-0 top-0 h-0.5 rounded-full bg-ink" transition={t}
+        animate={open ? { y: 5, rotate: 45 } : { y: 0, rotate: 0 }} />
+      <motion.span className="absolute left-0 right-0 bottom-0 h-0.5 rounded-full bg-ink" transition={t}
+        animate={open ? { y: -5, rotate: -45 } : { y: 0, rotate: 0 }} />
+    </span>
+  )
 }
 
 export default function Nav() {
   const [dark, toggleDark] = useDarkMode()
   const [open, setOpen] = useState(false)
-  const { scrollYProgress } = useScroll()
+  const [hovered, setHovered] = useState(null)
+  const active = useActiveSection(ids)
 
-  const themeIcon = <i className={dark ? 'fas fa-sun text-yellow-400' : 'fas fa-moon text-gray-600'} aria-hidden="true" />
+  useEffect(() => {
+    document.body.style.overflow = open ? 'hidden' : ''
+    const onKey = (e) => e.key === 'Escape' && setOpen(false)
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [open])
+
+  const ThemeIcon = dark ? Sun : Moon
+  const iconBtn = 'w-11 h-11 grid place-items-center rounded-full text-ink hover:bg-surface transition-colors duration-300 ease-base'
 
   return (
-    <>
-      <motion.div
-        className="fixed top-0 left-0 right-0 h-0.5 bg-linear-to-r from-primary via-accent to-purple-500 origin-left z-60"
-        style={{ scaleX: scrollYProgress }}
-        aria-hidden="true"
-      />
-      <nav className="fixed w-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 z-50">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16 items-center">
-            <a href="#top" className="font-display text-lg font-bold text-primary dark:text-white tracking-tight">
-              Masud Ibn Musa
-            </a>
-            <div className="hidden md:flex gap-8 items-center">
-              {navLinks.map((l) => (
-                <a key={l.label} href={l.href} className="hover:text-accent transition-colors text-sm font-medium">{l.label}</a>
-              ))}
-              <motion.button onClick={toggleDark} aria-label="Toggle dark mode" whileTap={{ scale: 0.9, rotate: -20 }}
-                className="w-10 h-10 grid place-items-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                {themeIcon}
-              </motion.button>
-            </div>
-            <button onClick={() => setOpen((o) => !o)} aria-label={open ? 'Close menu' : 'Open menu'} aria-controls="mobileMenu" aria-expanded={open}
-              className="md:hidden w-11 h-11 grid place-items-center">
-              <i className={`fas ${open ? 'fa-times' : 'fa-bars'} text-xl text-gray-600 dark:text-gray-300`} aria-hidden="true" />
-            </button>
-          </div>
-        </div>
+    <header className="fixed top-4 inset-x-0 z-50 flex justify-center px-4">
+      <nav aria-label="Main" className="flex items-center gap-1 rounded-full border border-line bg-page/70 backdrop-blur-xl p-1 shadow-sm">
+        <a href="#top" className="title-4 px-4 min-h-11 inline-flex items-center rounded-full">Masud Ibn Musa</a>
 
-        <AnimatePresence initial={false}>
-          {open && (
-            <motion.div
-              key="menu" id="mobileMenu"
-              initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0, transition: { duration: 0.2 } }}
-              style={{ overflow: 'hidden' }}
-              className="md:hidden bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
-            >
-              <motion.div className="px-4 py-3 space-y-2" initial="hidden" animate="show"
-                variants={{ show: { transition: { staggerChildren: 0.04 } } }}>
-                {navLinks.map((l) => (
-                  <motion.a key={l.label} href={l.href} onClick={() => setOpen(false)} className="block py-2 hover:text-accent"
-                    variants={{ hidden: { opacity: 0, x: -12 }, show: { opacity: 1, x: 0 } }}>
-                    {l.label}
-                  </motion.a>
-                ))}
-                <button onClick={toggleDark} className="flex items-center gap-2 py-2 hover:text-accent">
-                  {themeIcon} Toggle theme
-                </button>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* One pill slides between links: it follows the pointer and rests on the current section */}
+        <ul className="hidden md:flex items-center gap-1" onMouseLeave={() => setHovered(null)}>
+          {navLinks.map((l) => {
+            const id = l.href.slice(1)
+            const current = active === id
+            const pill = (hovered ?? active) === id
+            return (
+              <li key={l.label} className="relative">
+                {pill && <motion.span layoutId="nav-pill" transition={spring} className="absolute inset-0 rounded-full bg-surface" />}
+                <a href={l.href} aria-current={current ? 'location' : undefined}
+                  onMouseEnter={() => setHovered(id)} onFocus={() => setHovered(id)} onBlur={() => setHovered(null)}
+                  className={`relative caption-1 px-3 min-h-11 inline-flex items-center rounded-full transition-colors duration-300 ease-base ${pill ? 'text-ink' : 'text-muted'}`}>
+                  {l.label}
+                </a>
+              </li>
+            )
+          })}
+        </ul>
+
+        <button onClick={toggleDark} aria-label={dark ? 'Switch to light theme' : 'Switch to dark theme'} className={`${iconBtn} overflow-hidden`}>
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.span key={dark ? 'sun' : 'moon'} className="grid"
+              initial={{ y: 16, rotate: -90, opacity: 0 }} animate={{ y: 0, rotate: 0, opacity: 1 }} exit={{ y: -16, rotate: 90, opacity: 0 }}
+              transition={{ duration: 0.25, ease: easeOut }}>
+              <ThemeIcon size={18} />
+            </motion.span>
+          </AnimatePresence>
+        </button>
+        <button onClick={() => setOpen((o) => !o)} aria-label={open ? 'Close menu' : 'Open menu'} aria-expanded={open} aria-controls="mobile-menu"
+          className={`md:hidden ${iconBtn} relative z-10`}>
+          <MenuIcon open={open} />
+        </button>
       </nav>
-    </>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div id="mobile-menu" key="menu" className="md:hidden fixed inset-0 -z-10 bg-page/95 backdrop-blur-2xl px-6 pt-24"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3, ease: easeOut }}>
+            <motion.ul initial="hidden" animate="show" variants={{ show: { transition: { staggerChildren: 0.06 } } }}>
+              {navLinks.map((l) => (
+                <motion.li key={l.label} variants={{ hidden: { opacity: 0, y: 24 }, show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: easeOut } } }}>
+                  <a href={l.href} onClick={() => setOpen(false)} aria-current={active === l.href.slice(1) ? 'location' : undefined}
+                    className="heading-4 flex items-center min-h-11 py-3 text-ink aria-[current]:text-accent">
+                    {l.label}
+                  </a>
+                </motion.li>
+              ))}
+            </motion.ul>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </header>
   )
 }

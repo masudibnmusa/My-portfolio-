@@ -1,51 +1,35 @@
-import { useEffect, useRef } from 'react'
-import { animate, motion, useInView } from 'motion/react'
-import { stats } from '../data'
-import { cardHover, item, reveal, staggerGrid } from '../motion'
-
-function CountUp({ to }) {
-  const ref = useRef(null)
-  const inView = useInView(ref, { once: true })
-  useEffect(() => {
-    if (!inView) return
-    const controls = animate(0, to, { duration: 1.2, ease: 'easeOut', onUpdate: (v) => { ref.current.textContent = Math.round(v) } })
-    return () => controls.stop()
-  }, [inView, to])
-  return <span ref={ref}>{to}</span>
-}
+import { facts } from '../data'
+import Section from './Section'
 
 export default function About() {
   return (
-    <section id="about" className="py-20 bg-gray-50 dark:bg-gray-800">
-      <div className="max-w-6xl mx-auto px-4">
-        <motion.h2 {...reveal} className="font-display tracking-tight text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900 dark:text-white">
-          About Me
-        </motion.h2>
-        <motion.div {...reveal} className="max-w-3xl mx-auto text-center">
-          <p className="text-lg leading-relaxed mb-6 text-gray-600 dark:text-gray-300">
-            Software Developer | AI Enthusiast | Full-Stack Engineer <br />
-            I am a Software Engineering student at Daffodil International University, Bangladesh,
-            passionate about building scalable software systems and intelligent applications.
-            I specialize in backend development, system design, and turning ideas into real-world
-            products using modern technologies. I focus on writing clean, efficient code and
-            creating user-friendly solutions that solve practical problems.
-            <br />
-            Currently, I'm exploring <span className="text-purple-600 dark:text-purple-400 font-bold">AI engineering, LLM-based systems, and full-stack development</span> while
-            actively working on real projects and improving my software architecture skills.
+    <Section id="about" title="A quick read before you dig in" surface>
+      <div className="grid gap-10 md:grid-cols-[1fr_1fr] md:gap-16">
+        <div className="space-y-4 body-3 text-muted max-w-[680px]">
+          <p>
+            I'm studying Software Engineering at Daffodil International University in Bangladesh.
+            Most of my time goes into backend work and system design: the parts of an application
+            that store the data, run the logic and talk to other services.
           </p>
-          <motion.div {...staggerGrid} className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-8">
-            {stats.map((s) => (
-              <motion.div key={s.label} variants={item} {...cardHover}
-                className="p-4 bg-white dark:bg-gray-700 rounded-xl shadow-md hover:shadow-lg transition-shadow">
-                <div className="font-mono text-3xl font-bold text-primary dark:text-accent mb-1">
-                  {typeof s.value === 'number' ? <CountUp to={s.value} /> : s.value}{s.suffix}
-                </div>
-                <div className="text-sm text-secondary">{s.label}</div>
-              </motion.div>
-            ))}
-          </motion.div>
-        </motion.div>
+          <p>
+            Right now I'm going deep on <span className="text-ink font-medium">AI engineering</span>.
+            I've built a fine tuning pipeline, an evaluation framework for language models, and
+            several multi agent systems that plan, call tools and review each other's work.
+          </p>
+          <p>
+            I care about code that is clean, readable and solves a real problem for the person using it.
+          </p>
+        </div>
+
+        <dl className="rounded-2xl border border-line bg-raised p-6 divide-y divide-line">
+          {facts.map(([term, value]) => (
+            <div key={term} className="grid grid-cols-[96px_1fr] gap-4 py-3 first:pt-0 last:pb-0">
+              <dt className="caption-4 uppercase tracking-wider text-muted pt-0.5">{term}</dt>
+              <dd className="title-4 text-ink">{value}</dd>
+            </div>
+          ))}
+        </dl>
       </div>
-    </section>
+    </Section>
   )
 }

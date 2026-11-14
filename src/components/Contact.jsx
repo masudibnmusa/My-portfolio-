@@ -1,52 +1,71 @@
-import { motion } from 'motion/react'
-import { socials } from '../data'
-import { press, reveal } from '../motion'
+import { useState } from 'react'
+import { AnimatePresence, motion } from 'motion/react'
+import { Check, Copy, EnvelopeSimple, GithubLogo, InstagramLogo, LinkedinLogo } from '@phosphor-icons/react'
+import { EMAIL, socials } from '../data'
+import { reveal } from '../motion'
+import { Actions } from './Hero'
+
+const icons = { GitHub: GithubLogo, LinkedIn: LinkedinLogo, Instagram: InstagramLogo, Email: EnvelopeSimple }
+
+function CopyEmail() {
+  const [state, setState] = useState('idle')
+  async function copy() {
+    try { await navigator.clipboard.writeText(EMAIL); setState('copied') } catch { setState('failed') }
+    setTimeout(() => setState('idle'), 2500)
+  }
+  return (
+    <div className="flex flex-wrap items-center gap-3 mt-6">
+      <span className="font-mono body-6 text-muted break-all">{EMAIL}</span>
+      <button onClick={copy} className="caption-1 inline-flex items-center gap-1 min-h-11 px-3 rounded-lg text-ink hover:bg-surface transition-colors duration-300 ease-base active:scale-[0.98]">
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.span key={state === 'copied' ? 'check' : 'copy'} className="grid"
+            initial={{ scale: 0.4, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.4, opacity: 0 }}
+            transition={{ type: 'spring', bounce: 0.4, visualDuration: 0.25 }}>
+            {state === 'copied' ? <Check size={16} weight="bold" className="text-accent" aria-hidden="true" /> : <Copy size={16} aria-hidden="true" />}
+          </motion.span>
+        </AnimatePresence>
+        {state === 'copied' ? 'Email copied' : 'Copy email'}
+      </button>
+      <span role="status" className="caption-1 text-muted">{state === 'failed' ? 'Copy failed. Select the address above instead.' : ''}</span>
+    </div>
+  )
+}
 
 export function Contact() {
   return (
-    <section id="contact" className="py-20">
-      <div className="max-w-4xl mx-auto px-4">
-        <motion.h2 {...reveal} className="font-display tracking-tight text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900 dark:text-white">
-          Get In Touch
-        </motion.h2>
-        <motion.div {...reveal} className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 md:p-12 border border-gray-100 dark:border-gray-700 text-center">
-          <p className="text-lg text-gray-600 dark:text-gray-300 mb-4">
-            Feel free to reach out for collaborations or just a friendly hello.
+    <section id="contact" aria-labelledby="contact-title" className="py-24">
+      <motion.div {...reveal} className="mx-auto max-w-6xl px-6">
+        <div className="rounded-3xl border border-line bg-surface p-8 md:p-16">
+          <h2 id="contact-title" className="heading-4 md:heading-3 max-w-[680px]">Have a role or a project <br className="hidden md:block" />in mind?</h2>
+          <p className="body-3 text-muted mt-4 mb-8 max-w-[680px]">
+            Email is the quickest way to reach me. You can also read through my code on GitHub first.
           </p>
-          <a href="mailto:masudibnmusa10@gmail.com" className="inline-flex items-center gap-2 text-lg sm:text-2xl font-bold break-all text-primary dark:text-accent hover:text-accent transition-colors">
-            <i className="fas fa-envelope" aria-hidden="true" />
-            masudibnmusa10@gmail.com
-          </a>
-          <div className="mt-8 flex flex-wrap justify-center gap-4">
-            <motion.a href="https://github.com/masudibnmusa" target="_blank" rel="noopener noreferrer" {...press}
-              className="px-6 py-3 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors flex items-center gap-2 font-medium">
-              <i className="fab fa-github" aria-hidden="true" /> GitHub
-            </motion.a>
-            <motion.a href="https://www.linkedin.com/in/masudibnmusa10" target="_blank" rel="noopener noreferrer" {...press}
-              className="px-6 py-3 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors flex items-center gap-2 font-medium">
-              <i className="fab fa-linkedin" aria-hidden="true" /> LinkedIn
-            </motion.a>
-          </div>
-        </motion.div>
-      </div>
+          <Actions />
+          <CopyEmail />
+        </div>
+      </motion.div>
     </section>
   )
 }
 
 export function Footer() {
   return (
-    <footer className="bg-gray-900 text-white py-12">
-      <div className="max-w-6xl mx-auto px-4 text-center">
-        <div className="flex justify-center gap-6 mb-6 text-2xl">
-          {socials.map((s) => (
-            <a key={s.label} href={s.href} aria-label={s.label} className="hover:text-accent transition-colors"
-              {...(s.href.startsWith('http') && { target: '_blank', rel: 'noopener noreferrer' })}>
-              <i className={s.icon} aria-hidden="true" />
-            </a>
-          ))}
-        </div>
-        <p className="text-gray-400 text-sm">© {new Date().getFullYear()} Masud Ibn Musa. Software Engineering Student at Daffodil International University.</p>
-        <p className="text-gray-500 text-xs mt-2">Dhaka, Bangladesh</p>
+    <footer className="border-t border-line">
+      <div className="mx-auto max-w-6xl px-6 py-8 flex flex-col-reverse gap-4 md:flex-row md:items-center md:justify-between">
+        <p className="caption-5 text-muted">© {new Date().getFullYear()} Masud Ibn Musa · Dhaka, Bangladesh</p>
+        <ul className="flex items-center gap-1 -ml-3 md:ml-0 md:-mr-3">
+          {socials.map((s) => {
+            const Icon = icons[s.label]
+            return (
+              <li key={s.label}>
+                <a href={s.href} aria-label={s.label} {...(s.href.startsWith('http') && { target: '_blank', rel: 'noopener noreferrer' })}
+                  className="w-11 h-11 grid place-items-center rounded-full text-muted hover:text-ink hover:bg-surface transition-colors duration-300 ease-base">
+                  <Icon size={20} aria-hidden="true" />
+                </a>
+              </li>
+            )
+          })}
+        </ul>
       </div>
     </footer>
   )

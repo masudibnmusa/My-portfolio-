@@ -2,24 +2,89 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-@theme {
-  --color-primary: #1e3a5f;
-  --color-secondary: #64748b;
-  --color-accent: #3b82f6;
-  --font-sans: "DM Sans", system-ui, sans-serif;
-  --font-display: "Space Grotesk", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+/* Theme tokens: one flat surface set per mode, one accent */
+:root {
+  --page: #ffffff;
+  --surface: #f5f5f5;
+  --raised: #ffffff;
+  --line: #e5e5e5;
+  --ink: #0a0a0a;
+  --muted: #525252;
+  --accent: #2563eb;
+  --on-ink: #ffffff;
+}
+.dark {
+  --page: #181818;
+  --surface: #1f1f1f;
+  --raised: #272727;
+  --line: #313131;
+  --ink: #fafafa;
+  --muted: #a3a3a3;
+  --accent: #60a5fa;
+  --on-ink: #0a0a0a;
 }
 
-a, button { cursor: pointer; }
-:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; border-radius: 6px; }
-
-.hero-grid {
-  background-image: linear-gradient(to right, rgb(100 116 139 / .08) 1px, transparent 1px),
-                    linear-gradient(to bottom, rgb(100 116 139 / .08) 1px, transparent 1px);
-  background-size: 44px 44px;
-  mask-image: radial-gradient(ellipse at center, #000 30%, transparent 75%);
+@theme inline {
+  --color-page: var(--page);
+  --color-surface: var(--surface);
+  --color-raised: var(--raised);
+  --color-line: var(--line);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-on-ink: var(--on-ink);
+  --font-sans: "Geist", system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, monospace;
+  --ease-base: cubic-bezier(0.22, 1, 0.36, 1);
 }
+
+/* Named text styles (landing-page-design B1) */
+@utility heading-1 { font-size: var(--text-6xl); line-height: var(--text-6xl--line-height); font-weight: 600; letter-spacing: -0.03em; }
+@utility heading-2 { font-size: var(--text-5xl); line-height: var(--text-5xl--line-height); font-weight: 600; letter-spacing: -0.025em; }
+@utility heading-3 { font-size: var(--text-4xl); line-height: var(--text-4xl--line-height); font-weight: 600; letter-spacing: -0.02em; }
+@utility heading-4 { font-size: var(--text-3xl); line-height: var(--text-3xl--line-height); font-weight: 600; letter-spacing: -0.02em; }
+@utility heading-6 { font-size: var(--text-xl); line-height: var(--text-xl--line-height); font-weight: 600; }
+@utility title-1 { font-size: var(--text-xl); line-height: var(--text-xl--line-height); font-weight: 500; }
+@utility title-2 { font-size: var(--text-lg); line-height: var(--text-lg--line-height); font-weight: 500; }
+@utility title-3 { font-size: var(--text-base); line-height: var(--text-base--line-height); font-weight: 500; }
+@utility title-4 { font-size: var(--text-sm); line-height: var(--text-sm--line-height); font-weight: 500; }
+@utility body-3 { font-size: var(--text-base); line-height: var(--text-base--line-height); font-weight: 400; }
+@utility body-6 { font-size: var(--text-sm); line-height: var(--text-sm--line-height); font-weight: 400; }
+@utility button-md { font-size: var(--text-base); line-height: var(--text-base--line-height); font-weight: 600; }
+@utility button-sm { font-size: var(--text-sm); line-height: var(--text-sm--line-height); font-weight: 600; }
+@utility caption-1 { font-size: var(--text-sm); line-height: var(--text-sm--line-height); font-weight: 500; }
+@utility caption-4 { font-size: var(--text-xs); line-height: var(--text-xs--line-height); font-weight: 500; }
+@utility caption-5 { font-size: var(--text-xs); line-height: var(--text-xs--line-height); font-weight: 400; }
+
+/* Hero heading: the only gradient on the page, text only */
+@utility hero-gradient {
+  background-image: linear-gradient(to right, #000000, #666666);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  .dark & { background-image: linear-gradient(to right, #ffffff, #9b9b9b); }
+}
+
+/* Buttons: one primary, one secondary. 8px / 12px padding, 44px tap height */
+@utility btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 44px; padding: 8px 12px; border-radius: var(--radius-lg);
+  font-size: var(--text-base); line-height: var(--text-base--line-height); font-weight: 600;
+  transition: transform 500ms var(--ease-base), background-color 300ms var(--ease-base), border-color 300ms var(--ease-base), color 300ms var(--ease-base);
+  &:hover { transform: translateY(-2px); }
+  &:active { transform: scale(0.98); }
+}
+@utility btn-primary { background: var(--ink); color: var(--on-ink); &:hover { background: var(--accent); color: #fff; } }
+@utility btn-secondary { border: 1px solid var(--line); color: var(--ink); background: var(--raised); &:hover { border-color: var(--muted); } }
+
+html { scroll-behavior: smooth; scroll-padding-top: 96px; }
+body { background: var(--page); color: var(--ink); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+h1, h2, h3, h4 { text-wrap: balance; }
+p, li, dd { text-wrap: pretty; }
+a, button, summary { cursor: pointer; }
+/* Tabbing into a section that hasn't revealed yet shows it at once */
+.reveal:focus-within { opacity: 1 !important; transform: none !important; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 8px; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
