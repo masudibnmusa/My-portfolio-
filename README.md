@@ -14,3 +14,16 @@ Software Engineering student at Daffodil International University, Bangladesh, p
 - LinkedIn: https://www.linkedin.com/in/masudibnmusa10
 - GitHub: https://github.com/masudibnmusa
 - Email: masudibnmusa10@gmail.com
+
+## Development
+
+Built with React + Vite, Tailwind CSS v4 and Motion. Content (projects, skills, links) lives in `src/data.js`.
+
+```bash
+npm install
+npm run dev        # site only, at http://localhost:5173 (the AI chat won't reply here)
+vercel dev         # site + /api/chat; needs GEMINI_API_KEY in the environment
+npm run build      # production build into dist/
+```
+
+On Vercel: Framework Preset **Vite**, and set `GEMINI_API_KEY` in Environment Variables.
